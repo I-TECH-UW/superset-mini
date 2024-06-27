@@ -125,14 +125,13 @@ services:
       disable: true
   version: '3.7'
 
-services:
-    couchdb:
-      image: public.ecr.aws/medic/cht-couchdb:4.8.0
-      restart: always
-      ports:
-        - "5984:5984"
-      env_file:
-        docker/.env
+  couchdb:
+    image: public.ecr.aws/medic/cht-couchdb:4.8.0
+    restart: always
+    ports:
+      - "5984:5984"
+    env_file:
+      docker/.env
 
 volumes:
   superset_home:
