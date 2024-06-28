@@ -6,4 +6,4 @@ The goal it to configure it to run smoothly with [CHT-Sync](https://github.com/m
 
 `cp docker/.env.example docker/.env`
 
-`docker compose up -d`
+`docker-compose up -d`
