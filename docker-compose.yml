@@ -124,6 +124,16 @@ services:
     healthcheck:
       disable: true
 
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - superset
+
 volumes:
   superset_home:
     external: false
