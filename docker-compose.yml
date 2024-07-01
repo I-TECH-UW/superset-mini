@@ -133,6 +133,41 @@ services:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - superset
+    env_file:
+      - docker/.env
+
+  couch2pg:
+    build: ../cht-sync/couch2pg/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "512m"
+    env_file:
+      - docker/.env
+    environment:
+      - POSTGRES_USER=${DBT_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${DBT_POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${DBT_POSTGRES_HOST}
+      - POSTGRES_DB=${DBT_POSTGRES_DB}
+      - POSTGRES_PORT=5432
+      - POSTGRES_SCHEMA=${DBT_POSTGRES_SCHEMA}
+      - POSTGRES_TABLE=${DBT_POSTGRES_TABLE}
+  
+  dbt:
+    build: ../cht-sync/dbt/
+    working_dir: /dbt/
+    env_file:
+      - docker/.env
+    environment:
+      - POSTGRES_HOST=${DBT_POSTGRES_HOST}
+      - POSTGRES_USER=${DBT_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${DBT_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${DBT_POSTGRES_DB}
+      - POSTGRES_TABLE=${DBT_POSTGRES_TABLE}
+      - POSTGRES_SCHEMA=${DBT_POSTGRES_SCHEMA}
+  
 
 volumes:
   superset_home:
