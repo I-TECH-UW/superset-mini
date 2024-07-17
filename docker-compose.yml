@@ -56,6 +56,8 @@ services:
     volumes:
       - db_home:/var/lib/postgresql/data
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - superset-net
 
   superset:
     env_file:
@@ -72,6 +74,10 @@ services:
       - 8088:8088
     depends_on: *superset-depends-on
     volumes: *superset-volumes
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - superset-net
 
   superset-init:
     container_name: superset_init
@@ -87,6 +93,8 @@ services:
     volumes: *superset-volumes
     healthcheck:
       disable: true
+    networks:
+      - superset-net
 
   superset-worker:
     image: apache/superset:latest
@@ -101,12 +109,16 @@ services:
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test:
         [
           "CMD-SHELL",
           "celery -A superset.tasks.celery_app:app inspect ping -d celery@$$HOSTNAME",
         ]
+    networks:
+      - superset-net
 
   superset-worker-beat:
     image: apache/superset:latest
@@ -121,8 +133,12 @@ services:
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       disable: true
+    networks:
+      - superset-net
 
   nginx:
     image: nginx:latest
@@ -135,39 +151,9 @@ services:
       - superset
     env_file:
       - docker/.env
-
-  couch2pg:
-    build: ../cht-sync/couch2pg/
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "512m"
-    env_file:
-      - docker/.env
-    environment:
-      - POSTGRES_USER=${DBT_POSTGRES_USER}
-      - POSTGRES_PASSWORD=${DBT_POSTGRES_PASSWORD}
-      - POSTGRES_HOST=${DBT_POSTGRES_HOST}
-      - POSTGRES_DB=${DBT_POSTGRES_DB}
-      - POSTGRES_PORT=5432
-      - POSTGRES_SCHEMA=${DBT_POSTGRES_SCHEMA}
-      - POSTGRES_TABLE=${DBT_POSTGRES_TABLE}
-  
-  dbt:
-    build: ../cht-sync/dbt/
-    working_dir: /dbt/
-    env_file:
-      - docker/.env
-    environment:
-      - POSTGRES_HOST=${DBT_POSTGRES_HOST}
-      - POSTGRES_USER=${DBT_POSTGRES_USER}
-      - POSTGRES_PASSWORD=${DBT_POSTGRES_PASSWORD}
-      - POSTGRES_DB=${DBT_POSTGRES_DB}
-      - POSTGRES_TABLE=${DBT_POSTGRES_TABLE}
-      - POSTGRES_SCHEMA=${DBT_POSTGRES_SCHEMA}
-  
+    networks:
+      - superset-net
+      - cht-net
 
 volumes:
   superset_home:
@@ -176,3 +162,7 @@ volumes:
     external: false
   redis:
     external: false
+
+networks:
+  superset-net:
+    name: superset-net
