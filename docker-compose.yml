@@ -44,7 +44,8 @@ services:
     volumes:
       - redis:/data
     networks:
-      - superset-net
+      superset-net:
+      cht-net:
 
   db:
     env_file:
@@ -59,7 +60,8 @@ services:
       - db_home:/var/lib/postgresql/data
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
-      - superset-net
+      superset-net:
+      cht-net:
 
   superset:
     env_file:
@@ -79,7 +81,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - superset-net
+      superset-net:
+      cht-net:
 
   superset-init:
     container_name: superset_init
@@ -96,7 +99,8 @@ services:
     healthcheck:
       disable: true
     networks:
-      - superset-net
+      superset-net:
+      cht-net:
 
   superset-worker:
     image: apache/superset:latest
@@ -120,7 +124,8 @@ services:
           "celery -A superset.tasks.celery_app:app inspect ping -d celery@$$HOSTNAME",
         ]
     networks:
-      - superset-net
+      superset-net:
+      cht-net:
 
   superset-worker-beat:
     image: apache/superset:latest
@@ -140,7 +145,8 @@ services:
     healthcheck:
       disable: true
     networks:
-      - superset-net
+      superset-net:
+      cht-net:
 
   nginx:
     image: nginx:latest
@@ -156,8 +162,8 @@ services:
     env_file:
       - docker/.env
     networks:
-      - superset-net
-      - cht-net
+      superset-net:
+      cht-net:
 
 volumes:
   superset_home:
@@ -170,3 +176,5 @@ volumes:
 networks:
   superset-net:
     name: superset-net
+  cht-net:
+    name: ${CHT_NETWORK:-cht-net}
