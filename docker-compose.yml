@@ -145,6 +145,8 @@ services:
   nginx:
     image: nginx:latest
     container_name: nginx
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "80:80"
     volumes:
