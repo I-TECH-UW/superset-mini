@@ -7,3 +7,7 @@ The goal it to configure it to run smoothly with [CHT-Sync](https://github.com/m
 `cp docker/.env.example docker/.env`
 
 `docker-compose up -d`
+
+## NGINX
+
+If you're installing this superset on the same server that is running CHT applicaiton, the NGINX service will not start because of the port conflict. You'll need to proxy superset using CHT Nginx.
