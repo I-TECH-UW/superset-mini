@@ -74,29 +74,102 @@ DATA_CACHE_CONFIG = CACHE_CONFIG
 
 class CeleryConfig:
     broker_url = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"
-    imports = ("superset.sql_lab",)
+    imports = (
+        "superset.sql_lab",
+        "superset.tasks.scheduler",
+        "superset.tasks.alerts",
+    )
     result_backend = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_RESULTS_DB}"
     worker_prefetch_multiplier = 1
     task_acks_late = False
+    task_annotations = {
+        "sql_lab.get_sql_results": {"rate_limit": "100/s"},
+        "reports.scheduler": {"rate_limit": "10/m"},
+        "alerts.scheduler": {"rate_limit": "10/m"},
+    }
     beat_schedule = {
+        # Reports scheduling - runs every minute to check for scheduled reports
         "reports.scheduler": {
             "task": "reports.scheduler",
             "schedule": crontab(minute="*", hour="*"),
         },
+        # Clean up old report logs daily at midnight
         "reports.prune_log": {
             "task": "reports.prune_log",
             "schedule": crontab(minute=10, hour=0),
+        },
+        # Alerts scheduling - runs every minute to check for triggered alerts
+        "alerts.scheduler": {
+            "task": "alerts.scheduler",
+            "schedule": crontab(minute="*", hour="*"),
+        },
+        # Clean up old alert logs daily at 1 AM
+        "alerts.prune_log": {
+            "task": "alerts.prune_log",
+            "schedule": crontab(minute=0, hour=1),
         },
     }
 
 
 CELERY_CONFIG = CeleryConfig
 
-FEATURE_FLAGS = {"ALERT_REPORTS": True}
-ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
+# =============================================================================
+# ALERTS AND REPORTS CONFIGURATION
+# =============================================================================
+
+# Enable alerts and reports feature
+FEATURE_FLAGS = {
+    "ALERT_REPORTS": True,
+    "DASHBOARD_RBAC": True,  # Enable dashboard-based access control for reports
+}
+
+# Alert and Reports Notification Settings
+ALERT_REPORTS_NOTIFICATION_DRY_RUN = True  # Set to False to enable actual notifications
+ALERT_REPORTS_ATTACH_REPORTS = True  # Attach report files to email notifications
+ALERT_REPORTS_MIN_INTERVAL = 60  # Minimum interval between alerts in seconds
+
+# Email Configuration for Alerts and Reports
+SMTP_HOST = os.getenv("SMTP_HOST", "localhost")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_STARTTLS = os.getenv("SMTP_STARTTLS", "True").lower() == "true"
+SMTP_SSL_SERVER_AUTH = os.getenv("SMTP_SSL_SERVER_AUTH", "False").lower() == "true"
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+SMTP_MAIL_FROM = os.getenv("SMTP_MAIL_FROM", "superset@localhost")
+
+# Slack Configuration for Alerts and Reports (disabled)
+# SLACK_API_TOKEN = os.getenv("SLACK_API_TOKEN", "")
+# SLACK_PROXY = os.getenv("SLACK_PROXY", "")
+
+# WebDriver Configuration for Report Screenshots
+WEBDRIVER_TYPE = os.getenv("WEBDRIVER_TYPE", "chrome")
 WEBDRIVER_BASEURL = "http://superset:8088/"  # When using docker compose baseurl should be http://superset_app:8088/
-# The base URL for the email report hyperlinks.
 WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
+WEBDRIVER_OPTION_ARGS = [
+    "--force-device-scale-factor=2.0",
+    "--high-dpi-support=2.0",
+    "--headless",
+    "--disable-gpu",
+    "--disable-dev-shm-usage",
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-extensions",
+    "--disable-web-security",
+    "--allow-running-insecure-content",
+]
+
+# Report Configuration
+REPORTS_CHART_HEIGHT = 600  # Height of charts in reports (pixels)
+REPORTS_CHART_WIDTH = 800   # Width of charts in reports (pixels)
+REPORTS_WEBDRIVER_WINDOW = {
+    "dashboard": (1600, 2000),
+    "slice": (3000, 1200),
+}
+
+# Alert Configuration
+ALERT_SQL_BASED_ALERT_QUERY_TIMEOUT = 300  # Timeout for alert queries in seconds
+ALERT_MAX_RETRIES = 3  # Maximum retry attempts for failed alerts
+
 SQLLAB_CTAS_NO_LIMIT = True
 
 #

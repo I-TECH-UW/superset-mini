@@ -69,6 +69,16 @@ services:
         required: true
       - path: docker/.env-local # optional override
         required: false
+    environment:
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_STARTTLS=${SMTP_STARTTLS:-True}
+      - SMTP_SSL_SERVER_AUTH=${SMTP_SSL_SERVER_AUTH:-False}
+      - SMTP_USER=${SMTP_USER:-hermanmuhereza22@gmail.com}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_MAIL_FROM=${SMTP_MAIL_FROM:-hermanmuhereza22@gmail.com}
+      - WEBDRIVER_TYPE=${WEBDRIVER_TYPE:-chrome}
+      - ALERT_REPORTS_NOTIFICATION_DRY_RUN=${ALERT_REPORTS_NOTIFICATION_DRY_RUN:-True}
     image: apache/superset:latest
     container_name: superset_app
     command: ["/app/docker/docker-bootstrap.sh", "app-gunicorn"]
@@ -111,6 +121,16 @@ services:
         required: true
       - path: docker/.env-local # optional override
         required: false
+    environment:
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_STARTTLS=${SMTP_STARTTLS:-True}
+      - SMTP_SSL_SERVER_AUTH=${SMTP_SSL_SERVER_AUTH:-False}
+      - SMTP_USER=${SMTP_USER:-hermanmuhereza22@gmail.com}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_MAIL_FROM=${SMTP_MAIL_FROM:-hermanmuhereza22@gmail.com}
+      - WEBDRIVER_TYPE=${WEBDRIVER_TYPE:-chrome}
+      - ALERT_REPORTS_NOTIFICATION_DRY_RUN=${ALERT_REPORTS_NOTIFICATION_DRY_RUN:-True}
     restart: unless-stopped
     depends_on: *superset-depends-on
     user: "root"
@@ -136,6 +156,16 @@ services:
         required: true
       - path: docker/.env-local # optional override
         required: false
+    environment:
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_STARTTLS=${SMTP_STARTTLS:-True}
+      - SMTP_SSL_SERVER_AUTH=${SMTP_SSL_SERVER_AUTH:-False}
+      - SMTP_USER=${SMTP_USER:-hermanmuhereza22@gmail.com}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_MAIL_FROM=${SMTP_MAIL_FROM:-hermanmuhereza22@gmail.com}
+      - WEBDRIVER_TYPE=${WEBDRIVER_TYPE:-chrome}
+      - ALERT_REPORTS_NOTIFICATION_DRY_RUN=${ALERT_REPORTS_NOTIFICATION_DRY_RUN:-True}
     restart: unless-stopped
     depends_on: *superset-depends-on
     user: "root"
