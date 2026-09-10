@@ -45,7 +45,6 @@ services:
       - redis:/data
     networks:
       superset-net:
-      cht-net:
 
   db:
     env_file:
@@ -61,7 +60,6 @@ services:
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
       superset-net:
-      cht-net:
 
   superset:
     env_file:
@@ -82,7 +80,6 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       superset-net:
-      cht-net:
 
   superset-init:
     container_name: superset_init
@@ -100,7 +97,6 @@ services:
       disable: true
     networks:
       superset-net:
-      cht-net:
 
   superset-worker:
     image: apache/superset:latest
@@ -125,7 +121,6 @@ services:
         ]
     networks:
       superset-net:
-      cht-net:
 
   superset-worker-beat:
     image: apache/superset:latest
@@ -146,7 +141,6 @@ services:
       disable: true
     networks:
       superset-net:
-      cht-net:
 
   nginx:
     image: nginx:latest
@@ -163,7 +157,6 @@ services:
       - docker/.env
     networks:
       superset-net:
-      cht-net:
 
 volumes:
   superset_home:
@@ -176,5 +169,3 @@ volumes:
 networks:
   superset-net:
     name: superset-net
-  cht-net:
-    name: ${CHT_NETWORK:-cht-net}

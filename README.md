@@ -1,8 +1,6 @@
-## Welcome to Superset for CHT Repository
+## Welcome to the Superset Repository
 
-This repository is for running Superset the Comminuty Health ToolKit
-
-The goal it to configure it to run smoothly with [CHT-Sync](https://github.com/medic/cht-sync)
+This repository is for running Apache Superset.
 
 `cp docker/.env.example docker/.env`
 
@@ -10,4 +8,4 @@ The goal it to configure it to run smoothly with [CHT-Sync](https://github.com/m
 
 ## NGINX
 
-If you're installing this superset on the same server that is running CHT applicaiton, the NGINX service will not start because of the port conflict. You'll need to proxy superset using CHT Nginx.
+If you're installing this superset on a server that already serves another application on port 80, the NGINX service will not start because of the port conflict. You'll need to proxy superset using that application's Nginx.
